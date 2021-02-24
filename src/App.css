@@ -13,7 +13,7 @@
   }
 }
 
-.App-header {
+/*.App-header {
   background-color: #282c34;
   min-height: 100vh;
   display: flex;
@@ -26,9 +26,14 @@
 
 .App-link {
   color: #61dafb;
+}*/
+
+h1 {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  color: black;
 }
 
-.tab-list {  border-bottom: 1px solid #ccc;
+.tab-list {  border-bottom: 2px solid #500;
   padding-left: 0;
 }
 
@@ -41,8 +46,18 @@
 
 .tab-list-active {
   background-color: white;
-  border: solid #ccc;
-  border-width: 1px 1px 0 1px;
+  border: solid #500;
+  border-width: 2px 2px 0 2px;
+}
+
+.floated_img
+{
+    float: left;
+    border: 5px solid #555;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-right: 20px;
+    margin-left: 20px;
 }
 
 @keyframes App-logo-spin {

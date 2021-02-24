@@ -27,10 +27,10 @@ function App() {
         const image = await Storage.get(note.image);
         note.image = image;
       }
+      console.log(note)
       return note;
     }))
     setNotes(apiData.data.listNotes.items);
-    console.log(notes)
   }
 
   async function createNote() {
@@ -60,17 +60,15 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Pose Clustering Results</h1>
-      <Tabs>
-        <div label="Both Sides">
-          <input
+      <h1 >Pose Clustering Results </h1>
+      <input
             onChange={e => setFormData({ ...formData, 'name': e.target.value })}
-            placeholder="Note name"
+            placeholder="Video name"
             value={formData.name}
           />
           <input
             onChange={e => setFormData({ ...formData, 'description': e.target.value })}
-            placeholder="Note description"
+            placeholder="Video description"
             value={formData.description}
           />
           <input
@@ -78,6 +76,8 @@ function App() {
             onChange={onChange}
           />
           <button onClick={createNote}>Create Note</button>
+      <Tabs>
+        <div label="Both Sides">
           <div style={{ marginBottom: 30 }}>
             {
               notes.map(note => (
@@ -86,7 +86,8 @@ function App() {
                   <p>{note.description}</p>
                   <button onClick={() => deleteNote(note)}>Delete note</button>
                   {
-                    note.image && <img src={note.image} style={{ width: 400 }} />
+                    note.image && 
+                    <img src={note.image} />
                   }
                 </div>
               ))
@@ -94,7 +95,20 @@ function App() {
           </div>
         </div>
         <div label="Left Side">
-          After 'while, <em>Crocodile</em>!
+          <div style={{ marginBottom: 30 }}>
+            {
+              notes.map(note => (
+                <div key={note.id || note.name}>         
+                  {
+                    note.image && 
+                    <div className="floated_img">
+                    <img src={note.image} style={{ width: 400 }} />
+                    </div>
+                  }
+                </div>
+              ))
+            }
+          </div>
        </div>
         <div label="Right Side">
           Nothing to see here, this tab is <em>extinct</em>!
