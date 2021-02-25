@@ -94,7 +94,7 @@ h1 {
 /* Style the button and place it in the middle of the container/image */
 .container .btn {
   position: absolute;
-  top: 106.5%;
+  top: 108%;
   left: 40%;
   transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);

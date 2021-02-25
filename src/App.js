@@ -27,8 +27,11 @@ function App() {
       if (note.image) {
         //console.log(note.image)
         note.image = "demo/demo_output_4000.png"
+        note.image2 = "giphy.gif"
         const image = await Storage.get(note.image);
+        const image2 = await Storage.get(note.image2)
         note.image = image;
+        note.image2 = image2
       }
       console.log(note)
       return note;
@@ -106,7 +109,7 @@ function App() {
                     note.image &&
                     <div className="floated_img">
                       <div class="container">
-                        <img src={note.image} style={{ width: 300 }} />
+                        <img src={note.image2} style={{ width: 300 }} />
                         <img src={note.image} style={{ width: 300 }} />
                         <button class="btn">Select</button>
                       </div>
