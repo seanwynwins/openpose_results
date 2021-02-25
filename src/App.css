@@ -29,11 +29,28 @@
 }*/
 
 h1 {
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-  color: black;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #008CBA;
 }
 
-.tab-list {  border-bottom: 2px solid #500;
+.button {
+  background-color: #008CBA;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+.button:hover {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+
+.tab-list {  border-bottom: 2px solid #008CBA;
   padding-left: 0;
 }
 
@@ -46,18 +63,51 @@ h1 {
 
 .tab-list-active {
   background-color: white;
-  border: solid #500;
+  border: solid #008CBA;
   border-width: 2px 2px 0 2px;
 }
 
 .floated_img
 {
     float: left;
-    border: 5px solid #555;
+    border: solid #555;
+    border-width: 5px 5px 40px 5px;
     margin-top: 20px;
     margin-bottom: 20px;
     margin-right: 20px;
     margin-left: 20px;
+}
+
+/* Container needed to position the button. Adjust the width as needed */
+.container {
+  position: relative;
+  width: 50%;
+}
+
+/* Make the image responsive */
+.container img {
+  width: 100%;
+  height: auto;
+}
+
+/* Style the button and place it in the middle of the container/image */
+.container .btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  background-color: #555;
+  color: white;
+  font-size: 16px;
+  padding: 12px 24px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.container .btn:hover {
+  background-color: black;
 }
 
 @keyframes App-logo-spin {

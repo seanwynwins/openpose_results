@@ -23,7 +23,7 @@ function App() {
     await Promise.all(notesFromAPI.map(async note => {
       if (note.image) {
         //console.log(note.image)
-        note.image = "demo_output_20.png"
+        note.image = "demo/demo_output_4000.png"
         const image = await Storage.get(note.image);
         note.image = image;
       }
@@ -75,7 +75,7 @@ function App() {
             type="file"
             onChange={onChange}
           />
-          <button onClick={createNote}>Create Note</button>
+          <button class="button" onClick={createNote}>Cluster!</button>
       <Tabs>
         <div label="Both Sides">
           <div style={{ marginBottom: 30 }}>
@@ -102,7 +102,10 @@ function App() {
                   {
                     note.image && 
                     <div className="floated_img">
+                      <div class="container">
                     <img src={note.image} style={{ width: 400 }} />
+                    <button class="btn">Button</button>
+                    </div>
                     </div>
                   }
                 </div>
