@@ -71,11 +71,12 @@ h1 {
 {
     float: left;
     border: solid #555;
-    border-width: 5px 5px 40px 5px;
+    border-width: 5px 5px 60px 5px;
     margin-top: 20px;
     margin-bottom: 20px;
     margin-right: 20px;
     margin-left: 20px;
+    width: 300px; 
 }
 
 /* Container needed to position the button. Adjust the width as needed */
@@ -93,11 +94,11 @@ h1 {
 /* Style the button and place it in the middle of the container/image */
 .container .btn {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 106.5%;
+  left: 40%;
   transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
-  background-color: #555;
+  background-color: #008CBA;
   color: white;
   font-size: 16px;
   padding: 12px 24px;

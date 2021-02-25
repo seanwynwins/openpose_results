@@ -10,6 +10,9 @@ const initialFormState = { name: '', description: '' }
 
 function App() {
   const [notes, setNotes] = useState([]);
+  const [notes_left, setNotes_left] = useState([]);
+  const [notes_right, setNotes_right] = useState([]);
+  const [notes_other, setNotes_other] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
 
   useEffect(() => {
@@ -62,20 +65,20 @@ function App() {
     <div className="App">
       <h1 >Pose Clustering Results </h1>
       <input
-            onChange={e => setFormData({ ...formData, 'name': e.target.value })}
-            placeholder="Video name"
-            value={formData.name}
-          />
-          <input
-            onChange={e => setFormData({ ...formData, 'description': e.target.value })}
-            placeholder="Video description"
-            value={formData.description}
-          />
-          <input
-            type="file"
-            onChange={onChange}
-          />
-          <button class="button" onClick={createNote}>Cluster!</button>
+        onChange={e => setFormData({ ...formData, 'name': e.target.value })}
+        placeholder="Video name"
+        value={formData.name}
+      />
+      <input
+        onChange={e => setFormData({ ...formData, 'description': e.target.value })}
+        placeholder="Video description"
+        value={formData.description}
+      />
+      <input
+        type="file"
+        onChange={onChange}
+      />
+      <button class="button" onClick={createNote}>Cluster!</button>
       <Tabs>
         <div label="Both Sides">
           <div style={{ marginBottom: 30 }}>
@@ -86,7 +89,7 @@ function App() {
                   <p>{note.description}</p>
                   <button onClick={() => deleteNote(note)}>Delete note</button>
                   {
-                    note.image && 
+                    note.image &&
                     <img src={note.image} />
                   }
                 </div>
@@ -98,25 +101,26 @@ function App() {
           <div style={{ marginBottom: 30 }}>
             {
               notes.map(note => (
-                <div key={note.id || note.name}>         
+                <div key={note.id || note.name}>
                   {
-                    note.image && 
+                    note.image &&
                     <div className="floated_img">
                       <div class="container">
-                    <img src={note.image} style={{ width: 400 }} />
-                    <button class="btn">Button</button>
-                    </div>
+                        <img src={note.image} style={{ width: 300 }} />
+                        <img src={note.image} style={{ width: 300 }} />
+                        <button class="btn">Select</button>
+                      </div>
                     </div>
                   }
                 </div>
               ))
             }
           </div>
-       </div>
+        </div>
         <div label="Right Side">
           Nothing to see here, this tab is <em>extinct</em>!
        </div>
-       <div label="Other">
+        <div label="Other">
           lasdkflaskdf
        </div>
       </Tabs>
