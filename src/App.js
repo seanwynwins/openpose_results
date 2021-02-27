@@ -9,6 +9,11 @@ import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } fr
 const initialFormState = { name: '', description: '' }
 
 function App() {
+  // also have clusterGroups in addition to "notes"?
+  // each clusterGroup is probably like 1: ["name1", "name2"]
+  // so you iterate through each cluster group, and find name of note or whatever that is in
+  // it, and then render it?
+  // for each note in cluster group, display this shit
   const [notes, setNotes] = useState([]);
   const [notes_left, setNotes_left] = useState([]);
   const [notes_right, setNotes_right] = useState([]);
@@ -19,19 +24,20 @@ function App() {
     fetchNotes();
   }, []);
 
+
   async function fetchNotes() {
     const apiData = await API.graphql({ query: listNotes });
     const notesFromAPI = apiData.data.listNotes.items;
+    console.log(notesFromAPI)
     // see the thing is you're going to have to fetch images no matter what
     await Promise.all(notesFromAPI.map(async note => {
       if (note.image) {
-        //console.log(note.image)
-        note.image = "demo/demo_output_4000.png"
-        note.image2 = "giphy.gif"
+        console.log(note.image)
         const image = await Storage.get(note.image);
-        const image2 = await Storage.get(note.image2)
+        const skeleton = await Storage.get(note.name)
+        note.realID = note.id
         note.image = image;
-        note.image2 = image2
+        note.skeleton = skeleton
       }
       console.log(note)
       return note;
@@ -109,8 +115,8 @@ function App() {
                     note.image &&
                     <div className="floated_img">
                       <div class="container">
-                        <img src={note.image2} style={{ width: 300 }} />
-                        <img src={note.image} style={{ width: 300 }} />
+                        <img src={note.skeleton} style={{ width: 300 }} />
+                        <img src={note.image} style={{ height: 300, width: 300 }} />
                         <button class="btn">Select</button>
                       </div>
                     </div>
@@ -121,51 +127,37 @@ function App() {
           </div>
         </div>
         <div label="Right Side">
-          Nothing to see here, this tab is <em>extinct</em>!
+        
        </div>
         <div label="Other">
           lasdkflaskdf
        </div>
+       <div label="Test">
+       <div style={{ marginBottom: 30 }}>
+         
+            {
+              notes.map(note => (
+                <div key={note.id || note.name}>
+                  {
+                    note.image &&
+                    <div className="floated_img">
+                      <b class="cluster">Cluster {note.realID} </b>
+                      <div class="container">
+                        <img src={note.skeleton} style={{ width: 300 }} />
+                        <img src={note.image} style={{ width: 300 }} />
+                        <button class="btn">Select</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              ))
+            }
+          </div>
+         </div>
       </Tabs>
       <AmplifySignOut />
     </div>
   );
-
-  /*return (
-    <div className="App">
-      <h1>My Notes YeeHaw</h1>
-      <input
-        onChange={e => setFormData({ ...formData, 'name': e.target.value})}
-        placeholder="Note name"
-        value={formData.name}
-      />
-      <input
-        onChange={e => setFormData({ ...formData, 'description': e.target.value})}
-        placeholder="Note description"
-        value={formData.description}
-      />
-      <input
-        type="file"
-        onChange={onChange}
-      />
-      <button onClick={createNote}>Create Note</button>
-      <div style={{marginBottom: 30}}>
-        {
-          notes.map(note => (
-          <div key={note.id || note.name}>
-            <h2>{note.name}</h2>
-            <p>{note.description}</p>
-            <button onClick={() => deleteNote(note)}>Delete note</button>
-            {
-              note.image && <img src={note.image} style={{width: 400}} />
-            }
-          </div>
-          ))
-        }
-      </div>
-      <AmplifySignOut />
-    </div>
-  );*/
 }
 
 export default withAuthenticator(App);

@@ -33,6 +33,14 @@ h1 {
   color: #008CBA;
 }
 
+.cluster {
+  background-color: #555;
+  color: white;
+  height: 20px;
+  width: 300px;
+  display:inline-block;
+}
+
 .button {
   background-color: #008CBA;
   border: none;
@@ -71,7 +79,7 @@ h1 {
 {
     float: left;
     border: solid #555;
-    border-width: 5px 5px 60px 5px;
+    border-width: 6px 5px 60px 5px;
     margin-top: 20px;
     margin-bottom: 20px;
     margin-right: 20px;
@@ -94,7 +102,7 @@ h1 {
 /* Style the button and place it in the middle of the container/image */
 .container .btn {
   position: absolute;
-  top: 108%;
+  top: 106%;
   left: 40%;
   transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
@@ -109,6 +117,16 @@ h1 {
 
 .container .btn:hover {
   background-color: black;
+}
+
+.scrollable {
+  height: 500px; /* or any value */
+  overflow-y: auto;
+}
+
+img.resize {
+  width:200px;
+  height:40px;
 }
 
 @keyframes App-logo-spin {

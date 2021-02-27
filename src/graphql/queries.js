@@ -23,10 +23,7 @@ export const listNotes = /* GraphQL */ `
       items {
         id
         name
-        description
         image
-        createdAt
-        updatedAt
       }
       nextToken
     }
