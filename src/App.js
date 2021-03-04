@@ -17,7 +17,13 @@ function App() {
   const [notes, setNotes] = useState([]);
   const [notes_left, setNotes_left] = useState([]);
   const [notes_right, setNotes_right] = useState([]);
+
+  const [notes_NF, setNotes_NF] = useState([]);
+  const [notes_left_NF, setNotes_left_NF] = useState([]);
+  const [notes_right_NF, setNotes_right_NF] = useState([]);
+
   const [notes_other, setNotes_other] = useState([]);
+
   const [formData, setFormData] = useState(initialFormState);
 
   useEffect(() => {
@@ -29,20 +35,98 @@ function App() {
     const apiData = await API.graphql({ query: listNotes });
     const notesFromAPI = apiData.data.listNotes.items;
     console.log(notesFromAPI)
+    const bothNotes = []
+    const rightNotes = []
+    const leftNotes = []
+
+    const bothNotes_NF = []
+    const rightNotes_NF = []
+    const leftNotes_NF = []
+
+    const otherNotes = []
+
     // see the thing is you're going to have to fetch images no matter what
     await Promise.all(notesFromAPI.map(async note => {
-      if (note.image) {
+      if (note.image.includes("POSE.BOTH")) {
         console.log(note.image)
         const image = await Storage.get(note.image);
         const skeleton = await Storage.get(note.name)
         note.realID = note.id
         note.image = image;
         note.skeleton = skeleton
+        bothNotes.push(note)
+        return note;
       }
-      console.log(note)
-      return note;
+      else if (note.image.includes("POSE.RIGHT")) {
+        console.log(note.image)
+        const image = await Storage.get(note.image);
+        const skeleton = await Storage.get(note.name)
+        note.realID = note.id
+        note.image = image;
+        note.skeleton = skeleton
+        rightNotes.push(note)
+        return note;
+      }
+      else if (note.image.includes("POSE.LEFT")) {
+        console.log(note.image)
+        const image = await Storage.get(note.image);
+        const skeleton = await Storage.get(note.name)
+        note.realID = note.id
+        note.image = image;
+        note.skeleton = skeleton
+        leftNotes.push(note)
+        return note;
+      }
+      else if (note.image.includes("POSE.NOFACE_BOTH")) {
+        console.log(note.image)
+        const image = await Storage.get(note.image);
+        const skeleton = await Storage.get(note.name)
+        note.realID = note.id
+        note.image = image;
+        note.skeleton = skeleton
+        bothNotes_NF.push(note)
+        console.log("asdfaskdjfskdjf")
+        return note;
+      }
+      else if (note.image.includes("POSE.NOFACE_RIGHT")) {
+        console.log("WHEEEE")
+        const image = await Storage.get(note.image);
+        const skeleton = await Storage.get(note.name)
+        note.realID = note.id
+        note.image = image;
+        note.skeleton = skeleton
+        rightNotes_NF.push(note)
+        return note;
+      }
+      else if (note.image.includes("POSE.NOFACE_LEFT")) {
+        console.log(note.image)
+        const image = await Storage.get(note.image);
+        const skeleton = await Storage.get(note.name)
+        note.realID = note.id
+        note.image = image;
+        note.skeleton = skeleton
+        leftNotes_NF.push(note)
+        return note;
+      }
+      else {
+        console.log(note.image)
+        const image = await Storage.get(note.image);
+        const skeleton = await Storage.get(note.name)
+        note.realID = note.id
+        note.image = image;
+        note.skeleton = skeleton
+        otherNotes.push(note)
+        return note;
+      }
     }))
-    setNotes(apiData.data.listNotes.items);
+
+    setNotes(bothNotes);
+    setNotes_right(rightNotes);
+    setNotes_left(leftNotes);
+    setNotes_NF(bothNotes_NF)
+    setNotes_left_NF(leftNotes_NF)
+    setNotes_right_NF(rightNotes_NF)
+    setNotes_other(otherNotes)
   }
 
   async function createNote() {
@@ -90,51 +174,7 @@ function App() {
       <button class="button" onClick={createNote}>Cluster!</button>
       <Tabs>
         <div label="Both Sides">
-          <div style={{ marginBottom: 30 }}>
-            {
-              notes.map(note => (
-                <div key={note.id || note.name}>
-                  <h2>{note.name}</h2>
-                  <p>{note.description}</p>
-                  <button onClick={() => deleteNote(note)}>Delete note</button>
-                  {
-                    note.image &&
-                    <img src={note.image} />
-                  }
-                </div>
-              ))
-            }
-          </div>
-        </div>
-        <div label="Left Side">
-          <div style={{ marginBottom: 30 }}>
-            {
-              notes.map(note => (
-                <div key={note.id || note.name}>
-                  {
-                    note.image &&
-                    <div className="floated_img">
-                      <div class="container">
-                        <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.image} style={{ height: 300, width: 300 }} />
-                        <button class="btn">Select</button>
-                      </div>
-                    </div>
-                  }
-                </div>
-              ))
-            }
-          </div>
-        </div>
-        <div label="Right Side">
-        
-       </div>
-        <div label="Other">
-          lasdkflaskdf
-       </div>
-       <div label="Test">
-       <div style={{ marginBottom: 30 }}>
-         
+        <div style={{ marginBottom: 30 }}> 
             {
               notes.map(note => (
                 <div key={note.id || note.name}>
@@ -152,8 +192,122 @@ function App() {
                 </div>
               ))
             }
+            {
+              notes_NF.map(note => (
+                <div key={note.id || note.name}>
+                  {
+                    note.image &&
+                    <div className="floated_img_NOFACE">
+                      <b class="cluster_NOFACE">Cluster {note.realID} </b>
+                      <div class="container">
+                        <img src={note.skeleton} style={{ width: 300 }} />
+                        <img src={note.image} style={{ width: 300 }} />
+                        <button class="btn">Select</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              ))
+            }
           </div>
-         </div>
+        </div>
+        <div label="Right Side">
+        <div style={{ marginBottom: 30 }}> 
+          {
+              notes_right.map(note => (
+                <div key={note.id || note.name}>
+                  {
+                    note.image &&
+                    <div className="floated_img">
+                      <b class="cluster">Cluster {note.realID} </b>
+                      <div class="container">
+                        <img src={note.skeleton} style={{ width: 300 }} />
+                        <img src={note.image} style={{ width: 300 }} />
+                        <button class="btn">Select</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              ))
+            }
+            {
+              notes_right_NF.map(note => (
+                <div key={note.id || note.name}>
+                  {
+                    note.image &&
+                    <div className="floated_img_NOFACE">
+                      <b class="cluster_NOFACE">Cluster {note.realID} </b>
+                      <div class="container">
+                        <img src={note.skeleton} style={{ width: 300 }} />
+                        <img src={note.image} style={{ width: 300 }} />
+                        <button class="btn">Select</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        <div label="Left Side">
+        <div style={{ marginBottom: 30 }}> 
+          {
+              notes_left.map(note => (
+                <div key={note.id || note.name}>
+                  {
+                    note.image &&
+                    <div className="floated_img">
+                      <b class="cluster">Cluster {note.realID} </b>
+                      <div class="container">
+                        <img src={note.skeleton} style={{ width: 300 }} />
+                        <img src={note.image} style={{ width: 300 }} />
+                        <button class="btn">Select</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              ))
+            }
+            {
+              notes_left_NF.map(note => (
+                <div key={note.id || note.name}>
+                  {
+                    note.image &&
+                    <div className="floated_img_NOFACE">
+                      <b class="cluster_NOFACE">Cluster {note.realID} </b>
+                      <div class="container">
+                        <img src={note.skeleton} style={{ width: 300 }} />
+                        <img src={note.image} style={{ width: 300 }} />
+                        <button class="btn">Select</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              ))
+            }
+          </div>
+       </div>
+        <div label="Other">
+        <div style={{ marginBottom: 30 }}> 
+          {
+              notes_other.map(note => (
+                <div key={note.id || note.name}>
+                  {
+                    note.image &&
+                    <div className="floated_img">
+                      <b class="cluster">Cluster {note.realID} </b>
+                      <div class="container">
+                        <img src={note.skeleton} style={{ width: 300 }} />
+                        <img src={note.image} style={{ width: 300 }} />
+                        <button class="btn">Select</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              ))
+            }
+          </div>
+       </div>
       </Tabs>
       <AmplifySignOut />
     </div>

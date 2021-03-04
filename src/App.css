@@ -33,8 +33,16 @@ h1 {
   color: #008CBA;
 }
 
-.cluster {
+.cluster_NOFACE  {
   background-color: #555;
+  color: white;
+  height: 20px;
+  width: 300px;
+  display:inline-block;
+}
+
+.cluster {
+  background-color: rgb(121, 185, 193);
   color: white;
   height: 20px;
   width: 300px;
@@ -75,10 +83,22 @@ h1 {
   border-width: 2px 2px 0 2px;
 }
 
-.floated_img
+.floated_img_NOFACE
 {
     float: left;
     border: solid #555;
+    border-width: 6px 5px 60px 5px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-right: 20px;
+    margin-left: 20px;
+    width: 300px; 
+}
+
+.floated_img
+{
+    float: left;
+    border: solid rgb(121, 185, 193);
     border-width: 6px 5px 60px 5px;
     margin-top: 20px;
     margin-bottom: 20px;
