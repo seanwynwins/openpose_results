@@ -8,6 +8,7 @@ import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } fr
 
 const initialFormState = { name: '', description: '' }
 
+
 function App() {
   // also have clusterGroups in addition to "notes"?
   // each clusterGroup is probably like 1: ["name1", "name2"]
@@ -24,14 +25,31 @@ function App() {
 
   const [notes_other, setNotes_other] = useState([]);
 
+  const [notes_selected, setNotes_selected] = useState([]);
+
   const [formData, setFormData] = useState(initialFormState);
+
+  const dict = new Map();
+  dict.set("POSE.BOTH", [notes, setNotes]);
+  dict.set("POSE.RIGHT", [notes_right, setNotes_right]);
+  dict.set("POSE.LEFT", [notes_left, setNotes_left]);
+  dict.set("POSE.NOFACE_BOTH", [notes_NF, setNotes_NF]);
+  dict.set("POSE.NOFACE_RIGHT", [notes_right_NF, setNotes_right_NF]);
+  dict.set("POSE.NOFACE_LEFT", [notes_left_NF, setNotes_left_NF]);
+  dict.set("POSE.OTHER", [notes_other, setNotes_other]);
 
   useEffect(() => {
     fetchNotes();
   }, []);
 
+  /**useEffect(() => { 
+    setNotes_selected(notes_selected)
+  }, [])**/
+
+  console.log(notes_selected);
 
   async function fetchNotes() {
+
     const apiData = await API.graphql({ query: listNotes });
     const notesFromAPI = apiData.data.listNotes.items;
     console.log(notesFromAPI)
@@ -129,15 +147,69 @@ function App() {
     setNotes_other(otherNotes)
   }
 
+  function selectImage(note, type) { // param is the argument you passed to the function
+    console.log(note)
+
+    let selected = notes_selected
+
+    selected.push(note)
+
+    let selectedCopy = [...selected];
+
+    setNotes_selected(selectedCopy)
+
+    let list = dict.get(type)[0]
+
+    let updatedList = list.filter(e => e !== note)
+
+    let updatedCopy = [...updatedList];
+
+    let func = dict.get(type)[1]
+
+    func(updatedCopy)
+  }
+
+  function deselectImage(note) {
+    console.log(note)
+
+    // need to add back into array
+    let selected = notes_selected
+
+    let updatedSelected = selected.filter(e => e !== note)
+
+    let selectedCopy = [...updatedSelected]
+
+    setNotes_selected(selectedCopy)
+
+    let string = note["name"]
+
+    let type = string.split("_skeleton")[0];
+
+    console.log(type)
+
+    let list = dict.get(type)[0]
+
+    console.log(list)
+
+    list.push(note)
+
+    let updatedCopy = [...list]
+
+    let func = dict.get(type)[1]
+
+    func(updatedCopy)
+  }
+
   async function createNote() {
-    if (!formData.name || !formData.description) return;
+    fetchNotes([]);
+    /***if (!formData.name || !formData.description) return;
     await API.graphql({ query: createNoteMutation, variables: { input: formData } });
     if (formData.image) {
       const image = await Storage.get(formData.image);
       formData.image = image;
     }
     setNotes([...notes, formData]);
-    setFormData(initialFormState);
+    setFormData(initialFormState);***/
   }
 
   async function deleteNote({ id }) {
@@ -185,7 +257,7 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.image} style={{ width: 300 }} />
-                        <button class="btn">Select</button>
+                        <button class="btn" onClick={() => selectImage(note, "POSE.BOTH")}>Select</button>
                       </div>
                     </div>
                   }
@@ -202,7 +274,7 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.image} style={{ width: 300 }} />
-                        <button class="btn">Select</button>
+                        <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_BOTH")}>Select</button>
                       </div>
                     </div>
                   }
@@ -223,7 +295,7 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.image} style={{ width: 300 }} />
-                        <button class="btn">Select</button>
+                        <button class="btn" onClick={() => selectImage(note, "POSE.RIGHT")}>Select</button>
                       </div>
                     </div>
                   }
@@ -240,7 +312,7 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.image} style={{ width: 300 }} />
-                        <button class="btn">Select</button>
+                        <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_RIGHT")}>Select</button>
                       </div>
                     </div>
                   }
@@ -261,7 +333,7 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.image} style={{ width: 300 }} />
-                        <button class="btn">Select</button>
+                        <button class="btn" onClick={() => selectImage(note, "POSE.LEFT")}>Select</button>
                       </div>
                     </div>
                   }
@@ -278,7 +350,7 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.image} style={{ width: 300 }} />
-                        <button class="btn">Select</button>
+                        <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_LEFT")}>Select</button>
                       </div>
                     </div>
                   }
@@ -299,7 +371,7 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.image} style={{ width: 300 }} />
-                        <button class="btn">Select</button>
+                        <button class="btn" onClick={() => selectImage(note, "POSE.OTHER")}>Select</button>
                       </div>
                     </div>
                   }
@@ -307,6 +379,25 @@ function App() {
               ))
             }
           </div>
+       </div>
+       <div label="Selected">
+       {
+              notes_selected.map(note => (
+                <div key={note.id || note.name}>
+                  {
+                    note.image &&
+                    <div className="floated_img">
+                      <b class="cluster">Cluster {note.realID} </b>
+                      <div class="container">
+                        <img src={note.skeleton} style={{ width: 300 }} />
+                        <img src={note.image} style={{ width: 300 }} />
+                        <button class="btn" onClick={() => deselectImage(note)}>Deselect</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              ))
+            }
        </div>
       </Tabs>
       <AmplifySignOut />
