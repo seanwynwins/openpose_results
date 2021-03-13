@@ -24,6 +24,7 @@ export const listNotes = /* GraphQL */ `
         id
         name
         image
+        description
       }
       nextToken
     }

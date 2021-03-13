@@ -4,9 +4,8 @@
 export const createNote = /* GraphQL */ `
   mutation CreateNote(
     $input: CreateNoteInput!
-    $condition: ModelNoteConditionInput
   ) {
-    createNote(input: $input, condition: $condition) {
+    createNote(input: $input) {
       id
       name
       description
@@ -34,15 +33,12 @@ export const updateNote = /* GraphQL */ `
 export const deleteNote = /* GraphQL */ `
   mutation DeleteNote(
     $input: DeleteNoteInput!
-    $condition: ModelNoteConditionInput
   ) {
-    deleteNote(input: $input, condition: $condition) {
+    deleteNote(input: $input) {
       id
       name
-      description
       image
-      createdAt
-      updatedAt
+      description
     }
   }
 `;

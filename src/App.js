@@ -46,7 +46,7 @@ function App() {
     setNotes_selected(notes_selected)
   }, [])**/
 
-  console.log(notes_selected);
+  //console.log(notes_selected);
 
   async function fetchNotes() {
 
@@ -63,80 +63,112 @@ function App() {
 
     const otherNotes = []
 
+    const selectedNotes = []
+
     // see the thing is you're going to have to fetch images no matter what
     await Promise.all(notesFromAPI.map(async note => {
-      if (note.image.includes("POSE.BOTH")) {
-        console.log(note.image)
-        const image = await Storage.get(note.image);
-        const skeleton = await Storage.get(note.name)
-        note.realID = note.id
-        note.image = image;
-        note.skeleton = skeleton
-        bothNotes.push(note)
-        return note;
+      console.log(note.description)
+
+      let selected = "false"
+
+      if (note.description != null) {
+        if (note.description == "true") {
+          selected = "true"
+        }
       }
-      else if (note.image.includes("POSE.RIGHT")) {
-        console.log(note.image)
+
+      if (selected == "false") {
+        if (note.image.includes("POSE.BOTH")) {
+          console.log(note)
+          const image = await Storage.get(note.image);
+          const skeleton = await Storage.get(note.name)
+          note.id = note.id
+          note.original = image;
+          note.skeleton = skeleton
+          bothNotes.push(note)
+          return note;
+        }
+        else if (note.image.includes("POSE.RIGHT")) {
+          console.log(note.image)
+          const image = await Storage.get(note.image);
+          const skeleton = await Storage.get(note.name)
+          note.id = note.id
+          note.original = image;
+          note.skeleton = skeleton
+          rightNotes.push(note)
+          return note;
+        }
+        else if (note.image.includes("POSE.LEFT")) {
+          console.log(note.image)
+          const image = await Storage.get(note.image);
+          const skeleton = await Storage.get(note.name)
+          note.id = note.id
+          note.original = image;
+          note.skeleton = skeleton
+          leftNotes.push(note)
+          return note;
+        }
+        else if (note.image.includes("POSE.NOFACE_BOTH")) {
+          console.log(note.image)
+          const image = await Storage.get(note.image);
+          const skeleton = await Storage.get(note.name)
+          note.id = note.id
+          note.original = image;
+          note.skeleton = skeleton
+          bothNotes_NF.push(note)
+          console.log("asdfaskdjfskdjf")
+          return note;
+        }
+        else if (note.image.includes("POSE.NOFACE_RIGHT")) {
+          console.log("WHEEEE")
+          const image = await Storage.get(note.image);
+          const skeleton = await Storage.get(note.name)
+          note.id = note.id
+          note.original = image;
+          note.skeleton = skeleton
+          rightNotes_NF.push(note)
+          return note;
+        }
+        else if (note.image.includes("POSE.NOFACE_LEFT")) {
+          console.log(note.image)
+          const image = await Storage.get(note.image);
+          const skeleton = await Storage.get(note.name)
+          note.id = note.id
+          note.original = image;
+          note.skeleton = skeleton
+          leftNotes_NF.push(note)
+          return note;
+        }
+        else {
+          console.log(note.image)
+          const image = await Storage.get(note.image);
+          const skeleton = await Storage.get(note.name)
+          note.id = note.id
+          note.original = image;
+          note.skeleton = skeleton
+          otherNotes.push(note)
+          return note;
+        }
+      } else {
+        console.log("fuck")
         const image = await Storage.get(note.image);
         const skeleton = await Storage.get(note.name)
-        note.realID = note.id
-        note.image = image;
+        note.id = note.id
+        note.original = image;
         note.skeleton = skeleton
-        rightNotes.push(note)
-        return note;
-      }
-      else if (note.image.includes("POSE.LEFT")) {
-        console.log(note.image)
-        const image = await Storage.get(note.image);
-        const skeleton = await Storage.get(note.name)
-        note.realID = note.id
-        note.image = image;
-        note.skeleton = skeleton
-        leftNotes.push(note)
-        return note;
-      }
-      else if (note.image.includes("POSE.NOFACE_BOTH")) {
-        console.log(note.image)
-        const image = await Storage.get(note.image);
-        const skeleton = await Storage.get(note.name)
-        note.realID = note.id
-        note.image = image;
-        note.skeleton = skeleton
-        bothNotes_NF.push(note)
-        console.log("asdfaskdjfskdjf")
-        return note;
-      }
-      else if (note.image.includes("POSE.NOFACE_RIGHT")) {
-        console.log("WHEEEE")
-        const image = await Storage.get(note.image);
-        const skeleton = await Storage.get(note.name)
-        note.realID = note.id
-        note.image = image;
-        note.skeleton = skeleton
-        rightNotes_NF.push(note)
-        return note;
-      }
-      else if (note.image.includes("POSE.NOFACE_LEFT")) {
-        console.log(note.image)
-        const image = await Storage.get(note.image);
-        const skeleton = await Storage.get(note.name)
-        note.realID = note.id
-        note.image = image;
-        note.skeleton = skeleton
-        leftNotes_NF.push(note)
-        return note;
-      }
-      else {
-        console.log(note.image)
-        const image = await Storage.get(note.image);
-        const skeleton = await Storage.get(note.name)
-        note.realID = note.id
-        note.image = image;
-        note.skeleton = skeleton
-        otherNotes.push(note)
+        selectedNotes.push(note)
         return note;
       }
     }))
+
+    bothNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    rightNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    leftNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    bothNotes_NF.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    leftNotes_NF.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    rightNotes_NF.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    otherNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    selectedNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
 
     setNotes(bothNotes);
     setNotes_right(rightNotes);
@@ -145,18 +177,42 @@ function App() {
     setNotes_left_NF(leftNotes_NF)
     setNotes_right_NF(rightNotes_NF)
     setNotes_other(otherNotes)
+    setNotes_selected(selectedNotes)
+
   }
 
-  function selectImage(note, type) { // param is the argument you passed to the function
+  async function selectImage(note, type) { // param is the argument you passed to the function
     console.log(note)
 
+    let note2 = JSON.parse(JSON.stringify(note))
+
+    delete note2.original;
+
+    delete note2.skeleton
+
+    let id = note2.id
+
+    note2.description = "true"
+
+    console.log(note2)
+
+    await API.graphql({ query: deleteNoteMutation, variables: { input: { id } } });
+
+    await API.graphql({ query: createNoteMutation, variables: { input: note2 } });
+
     let selected = notes_selected
+
+    console.log(note)
 
     selected.push(note)
 
     let selectedCopy = [...selected];
 
+    selectedCopy.sort((a, b) => (a.id > b.id) ? 1 : -1)
+
     setNotes_selected(selectedCopy)
+
+    console.log(selectedCopy)
 
     let list = dict.get(type)[0]
 
@@ -169,8 +225,24 @@ function App() {
     func(updatedCopy)
   }
 
-  function deselectImage(note) {
+  async function deselectImage(note) {
     console.log(note)
+
+    let note2 = JSON.parse(JSON.stringify(note))
+
+    delete note2.original;
+
+    delete note2.skeleton
+
+    let id = note2.id
+
+    note2.description = "false"
+
+    console.log(note2)
+
+    await API.graphql({ query: deleteNoteMutation, variables: { input: { id } } });
+
+    await API.graphql({ query: createNoteMutation, variables: { input: note2 } });
 
     // need to add back into array
     let selected = notes_selected
@@ -197,7 +269,11 @@ function App() {
 
     let func = dict.get(type)[1]
 
+    updatedCopy.sort((a, b) => (a.id > b.id) ? 1 : -1)
+
     func(updatedCopy)
+    // store notes here?
+    console.log(updatedCopy)
   }
 
   async function createNote() {
@@ -246,17 +322,17 @@ function App() {
       <button class="button" onClick={createNote}>Cluster!</button>
       <Tabs>
         <div label="Both Sides">
-        <div style={{ marginBottom: 30 }}> 
+          <div style={{ marginBottom: 30 }}>
             {
               notes.map(note => (
                 <div key={note.id || note.name}>
                   {
                     note.image &&
                     <div className="floated_img">
-                      <b class="cluster">Cluster {note.realID} </b>
+                      <b class="cluster">Cluster {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.image} style={{ width: 300 }} />
+                        <img src={note.original} style={{ width: 300 }} />
                         <button class="btn" onClick={() => selectImage(note, "POSE.BOTH")}>Select</button>
                       </div>
                     </div>
@@ -270,10 +346,10 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img_NOFACE">
-                      <b class="cluster_NOFACE">Cluster {note.realID} </b>
+                      <b class="cluster_NOFACE">Cluster {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.image} style={{ width: 300 }} />
+                        <img src={note.original} style={{ width: 300 }} />
                         <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_BOTH")}>Select</button>
                       </div>
                     </div>
@@ -284,17 +360,17 @@ function App() {
           </div>
         </div>
         <div label="Right Side">
-        <div style={{ marginBottom: 30 }}> 
-          {
+          <div style={{ marginBottom: 30 }}>
+            {
               notes_right.map(note => (
                 <div key={note.id || note.name}>
                   {
                     note.image &&
                     <div className="floated_img">
-                      <b class="cluster">Cluster {note.realID} </b>
+                      <b class="cluster">Cluster {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.image} style={{ width: 300 }} />
+                        <img src={note.original} style={{ width: 300 }} />
                         <button class="btn" onClick={() => selectImage(note, "POSE.RIGHT")}>Select</button>
                       </div>
                     </div>
@@ -308,10 +384,10 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img_NOFACE">
-                      <b class="cluster_NOFACE">Cluster {note.realID} </b>
+                      <b class="cluster_NOFACE">Cluster {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.image} style={{ width: 300 }} />
+                        <img src={note.original} style={{ width: 300 }} />
                         <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_RIGHT")}>Select</button>
                       </div>
                     </div>
@@ -322,17 +398,17 @@ function App() {
           </div>
         </div>
         <div label="Left Side">
-        <div style={{ marginBottom: 30 }}> 
-          {
+          <div style={{ marginBottom: 30 }}>
+            {
               notes_left.map(note => (
                 <div key={note.id || note.name}>
                   {
                     note.image &&
                     <div className="floated_img">
-                      <b class="cluster">Cluster {note.realID} </b>
+                      <b class="cluster">Cluster {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.image} style={{ width: 300 }} />
+                        <img src={note.original} style={{ width: 300 }} />
                         <button class="btn" onClick={() => selectImage(note, "POSE.LEFT")}>Select</button>
                       </div>
                     </div>
@@ -346,10 +422,10 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img_NOFACE">
-                      <b class="cluster_NOFACE">Cluster {note.realID} </b>
+                      <b class="cluster_NOFACE">Cluster {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.image} style={{ width: 300 }} />
+                        <img src={note.original} style={{ width: 300 }} />
                         <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_LEFT")}>Select</button>
                       </div>
                     </div>
@@ -358,19 +434,19 @@ function App() {
               ))
             }
           </div>
-       </div>
+        </div>
         <div label="Other">
-        <div style={{ marginBottom: 30 }}> 
-          {
+          <div style={{ marginBottom: 30 }}>
+            {
               notes_other.map(note => (
                 <div key={note.id || note.name}>
                   {
                     note.image &&
                     <div className="floated_img">
-                      <b class="cluster">Cluster {note.realID} </b>
+                      <b class="cluster">Cluster {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.image} style={{ width: 300 }} />
+                        <img src={note.original} style={{ width: 300 }} />
                         <button class="btn" onClick={() => selectImage(note, "POSE.OTHER")}>Select</button>
                       </div>
                     </div>
@@ -379,26 +455,26 @@ function App() {
               ))
             }
           </div>
-       </div>
-       <div label="Selected">
-       {
-              notes_selected.map(note => (
-                <div key={note.id || note.name}>
-                  {
-                    note.image &&
-                    <div className="floated_img">
-                      <b class="cluster">Cluster {note.realID} </b>
-                      <div class="container">
-                        <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.image} style={{ width: 300 }} />
-                        <button class="btn" onClick={() => deselectImage(note)}>Deselect</button>
-                      </div>
+        </div>
+        <div label="Selected">
+          {
+            notes_selected.map(note => (
+              <div key={note.id || note.name}>
+                {
+                  note.image &&
+                  <div className="floated_img">
+                    <b class="cluster">Cluster {note.id} </b>
+                    <div class="container">
+                      <img src={note.skeleton} style={{ width: 300 }} />
+                      <img src={note.original} style={{ width: 300 }} />
+                      <button class="btn" onClick={() => deselectImage(note)}>Deselect</button>
                     </div>
-                  }
-                </div>
-              ))
-            }
-       </div>
+                  </div>
+                }
+              </div>
+            ))
+          }
+        </div>
       </Tabs>
       <AmplifySignOut />
     </div>
