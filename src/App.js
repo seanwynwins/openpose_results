@@ -15,6 +15,13 @@ function App() {
   // so you iterate through each cluster group, and find name of note or whatever that is in
   // it, and then render it?
   // for each note in cluster group, display this shit
+  function showPicture() {
+    var sourceOfPicture = "http://img.tesco.com/Groceries/pi/118/5000175411118/IDShot_90x90.jpg";
+    var img = document.getElementById('bigpic')
+    img.src = sourceOfPicture.replace('90x90', '225x225');
+    img.style.display = "block";
+  } 
+
   const [notes, setNotes] = useState([]);
   const [notes_left, setNotes_left] = useState([]);
   const [notes_right, setNotes_right] = useState([]);
@@ -80,82 +87,124 @@ function App() {
       if (selected == "false") {
         if (note.image.includes("POSE.BOTH")) {
           console.log(note)
+
+          let n=note.image.lastIndexOf(".jpg");
+          let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
+          const image2 = await Storage.get(image2Name);
+
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
+
+          console.log(image2)
           note.id = note.id
           note.original = image;
           note.skeleton = skeleton
+          note.image2 = image2
           bothNotes.push(note)
           return note;
         }
         else if (note.image.includes("POSE.RIGHT")) {
+          let n=note.image.lastIndexOf(".jpg");
+          let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
           console.log(note.image)
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
           note.id = note.id
           note.original = image;
           note.skeleton = skeleton
+          const image2 = await Storage.get(image2Name);
+          note.image2 = image2
           rightNotes.push(note)
           return note;
         }
         else if (note.image.includes("POSE.LEFT")) {
+          let n=note.image.lastIndexOf(".jpg");
+          let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
+          const image2 = await Storage.get(image2Name);
           console.log(note.image)
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
           note.id = note.id
           note.original = image;
           note.skeleton = skeleton
+          note.image2 = image2
+
           leftNotes.push(note)
           return note;
         }
         else if (note.image.includes("POSE.NOFACE_BOTH")) {
+          let n=note.image.lastIndexOf(".jpg");
+          let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
+          const image2 = await Storage.get(image2Name);
           console.log(note.image)
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
           note.id = note.id
           note.original = image;
           note.skeleton = skeleton
+          note.image2 = image2
+
           bothNotes_NF.push(note)
           console.log("asdfaskdjfskdjf")
           return note;
         }
         else if (note.image.includes("POSE.NOFACE_RIGHT")) {
+          let n=note.image.lastIndexOf(".jpg");
+          let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
+          const image2 = await Storage.get(image2Name);
           console.log("WHEEEE")
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
           note.id = note.id
           note.original = image;
           note.skeleton = skeleton
+          note.image2 = image2
+
           rightNotes_NF.push(note)
           return note;
         }
         else if (note.image.includes("POSE.NOFACE_LEFT")) {
+          let n=note.image.lastIndexOf(".jpg");
+          let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
+          const image2 = await Storage.get(image2Name);
           console.log(note.image)
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
           note.id = note.id
           note.original = image;
           note.skeleton = skeleton
+          note.image2 = image2
+
           leftNotes_NF.push(note)
           return note;
         }
         else {
+          let n=note.image.lastIndexOf(".jpg");
+          let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
+          const image2 = await Storage.get(image2Name);
           console.log(note.image)
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
           note.id = note.id
           note.original = image;
           note.skeleton = skeleton
+          note.image2 = image2
+
           otherNotes.push(note)
           return note;
         }
       } else {
+        let n=note.image.lastIndexOf(".jpg");
+        let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
+        const image2 = await Storage.get(image2Name);
         console.log("fuck")
         const image = await Storage.get(note.image);
         const skeleton = await Storage.get(note.name)
         note.id = note.id
         note.original = image;
         note.skeleton = skeleton
+        note.image2 = image2
+
         selectedNotes.push(note)
         return note;
       }
@@ -190,6 +239,8 @@ function App() {
 
     delete note2.skeleton
 
+    delete note2.image2
+
     let id = note2.id
 
     note2.description = "true"
@@ -214,6 +265,8 @@ function App() {
 
     console.log(selectedCopy)
 
+    console.log(dict)
+
     let list = dict.get(type)[0]
 
     let updatedList = list.filter(e => e !== note)
@@ -233,6 +286,8 @@ function App() {
     delete note2.original;
 
     delete note2.skeleton
+
+    delete note2.image2
 
     let id = note2.id
 
@@ -333,6 +388,7 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
+                        <img src={note.image2} style={{ width: 300 }} />
                         <button class="btn" onClick={() => selectImage(note, "POSE.BOTH")}>Select</button>
                       </div>
                     </div>
@@ -350,6 +406,8 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
+                        <img src={note.image2} style={{ width: 300 }} />
+
                         <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_BOTH")}>Select</button>
                       </div>
                     </div>
@@ -371,6 +429,8 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
+                        <img src={note.image2} style={{ width: 300 }} />
+
                         <button class="btn" onClick={() => selectImage(note, "POSE.RIGHT")}>Select</button>
                       </div>
                     </div>
@@ -388,6 +448,8 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
+                        <img src={note.image2} style={{ width: 300 }} />
+
                         <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_RIGHT")}>Select</button>
                       </div>
                     </div>
@@ -409,6 +471,8 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
+                        <img src={note.image2} style={{ width: 300 }} />
+
                         <button class="btn" onClick={() => selectImage(note, "POSE.LEFT")}>Select</button>
                       </div>
                     </div>
@@ -426,6 +490,8 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
+                        <img src={note.image2} style={{ width: 300 }} />
+
                         <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_LEFT")}>Select</button>
                       </div>
                     </div>
@@ -447,6 +513,8 @@ function App() {
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
+                        <img src={note.image2} style={{ width: 300 }} />
+
                         <button class="btn" onClick={() => selectImage(note, "POSE.OTHER")}>Select</button>
                       </div>
                     </div>
@@ -467,6 +535,8 @@ function App() {
                     <div class="container">
                       <img src={note.skeleton} style={{ width: 300 }} />
                       <img src={note.original} style={{ width: 300 }} />
+                      <img src={note.image2} style={{ width: 300 }} />
+
                       <button class="btn" onClick={() => deselectImage(note)}>Deselect</button>
                     </div>
                   </div>
