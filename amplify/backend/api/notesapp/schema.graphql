@@ -1,6 +1,10 @@
-type Note @model {
+type Note 
+@model 
+@auth(rules: [{allow: owner, ownerField: "percentage"}])
+{
   id: ID!
   name: String!
   description: String
   image: String
+  percentage: String
 }

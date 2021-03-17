@@ -74,7 +74,14 @@ function App() {
 
     // see the thing is you're going to have to fetch images no matter what
     await Promise.all(notesFromAPI.map(async note => {
-      console.log(note.description)
+
+      console.log(note.id)
+
+      let noteInfo = note.id.split(" ")
+
+      note.percentage = parseFloat(noteInfo[1])
+
+      console.log(note.percentage)
 
       let selected = "false"
 
@@ -86,7 +93,6 @@ function App() {
 
       if (selected == "false") {
         if (note.image.includes("POSE.BOTH")) {
-          console.log(note)
 
           let n=note.image.lastIndexOf(".jpg");
           let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
@@ -96,7 +102,6 @@ function App() {
           const skeleton = await Storage.get(note.name)
 
           console.log(image2)
-          note.id = note.id
           note.original = image;
           note.skeleton = skeleton
           note.image2 = image2
@@ -106,10 +111,8 @@ function App() {
         else if (note.image.includes("POSE.RIGHT")) {
           let n=note.image.lastIndexOf(".jpg");
           let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
-          console.log(note.image)
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
-          note.id = note.id
           note.original = image;
           note.skeleton = skeleton
           const image2 = await Storage.get(image2Name);
@@ -124,7 +127,6 @@ function App() {
           console.log(note.image)
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
-          note.id = note.id
           note.original = image;
           note.skeleton = skeleton
           note.image2 = image2
@@ -139,7 +141,6 @@ function App() {
           console.log(note.image)
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
-          note.id = note.id
           note.original = image;
           note.skeleton = skeleton
           note.image2 = image2
@@ -155,7 +156,6 @@ function App() {
           console.log("WHEEEE")
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
-          note.id = note.id
           note.original = image;
           note.skeleton = skeleton
           note.image2 = image2
@@ -170,7 +170,6 @@ function App() {
           console.log(note.image)
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
-          note.id = note.id
           note.original = image;
           note.skeleton = skeleton
           note.image2 = image2
@@ -185,7 +184,6 @@ function App() {
           console.log(note.image)
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
-          note.id = note.id
           note.original = image;
           note.skeleton = skeleton
           note.image2 = image2
@@ -200,7 +198,6 @@ function App() {
         console.log("fuck")
         const image = await Storage.get(note.image);
         const skeleton = await Storage.get(note.name)
-        note.id = note.id
         note.original = image;
         note.skeleton = skeleton
         note.image2 = image2
@@ -210,14 +207,14 @@ function App() {
       }
     }))
 
-    bothNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
-    rightNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
-    leftNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
-    bothNotes_NF.sort((a, b) => (a.id > b.id) ? 1 : -1)
-    leftNotes_NF.sort((a, b) => (a.id > b.id) ? 1 : -1)
-    rightNotes_NF.sort((a, b) => (a.id > b.id) ? 1 : -1)
-    otherNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
-    selectedNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    bothNotes.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
+    rightNotes.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
+    leftNotes.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
+    bothNotes_NF.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
+    rightNotes_NF.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
+    leftNotes_NF.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
+    otherNotes.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
+    selectedNotes.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
 
     setNotes(bothNotes);
     setNotes_right(rightNotes);
@@ -227,7 +224,6 @@ function App() {
     setNotes_right_NF(rightNotes_NF)
     setNotes_other(otherNotes)
     setNotes_selected(selectedNotes)
-
   }
 
   async function selectImage(note, type) { // param is the argument you passed to the function
@@ -240,6 +236,8 @@ function App() {
     delete note2.skeleton
 
     delete note2.image2
+
+    delete note2.percentage
 
     let id = note2.id
 
@@ -259,7 +257,7 @@ function App() {
 
     let selectedCopy = [...selected];
 
-    selectedCopy.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    selectedCopy.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
 
     setNotes_selected(selectedCopy)
 
@@ -288,6 +286,8 @@ function App() {
     delete note2.skeleton
 
     delete note2.image2
+
+    delete note2.percentage
 
     let id = note2.id
 
@@ -324,7 +324,7 @@ function App() {
 
     let func = dict.get(type)[1]
 
-    updatedCopy.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    updatedCopy.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
 
     func(updatedCopy)
     // store notes here?
@@ -384,7 +384,7 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img">
-                      <b class="cluster">Cluster {note.id} </b>
+                      <b class="cluster"> {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
@@ -402,7 +402,7 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img_NOFACE">
-                      <b class="cluster_NOFACE">Cluster {note.id} </b>
+                      <b class="cluster_NOFACE"> {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
@@ -425,7 +425,7 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img">
-                      <b class="cluster">Cluster {note.id} </b>
+                      <b class="cluster"> {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
@@ -444,7 +444,7 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img_NOFACE">
-                      <b class="cluster_NOFACE">Cluster {note.id} </b>
+                      <b class="cluster_NOFACE"> {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
@@ -467,7 +467,7 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img">
-                      <b class="cluster">Cluster {note.id} </b>
+                      <b class="cluster"> {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
@@ -486,7 +486,7 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img_NOFACE">
-                      <b class="cluster_NOFACE">Cluster {note.id} </b>
+                      <b class="cluster_NOFACE"> {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
@@ -509,7 +509,7 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img">
-                      <b class="cluster">Cluster {note.id} </b>
+                      <b class="cluster"> {note.id} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} />
                         <img src={note.original} style={{ width: 300 }} />
@@ -531,7 +531,7 @@ function App() {
                 {
                   note.image &&
                   <div className="floated_img">
-                    <b class="cluster">Cluster {note.id} </b>
+                    <b class="cluster"> {note.id} </b>
                     <div class="container">
                       <img src={note.skeleton} style={{ width: 300 }} />
                       <img src={note.original} style={{ width: 300 }} />
