@@ -6,5 +6,4 @@ type Note
   name: String!
   description: String
   image: String
-  percentage: String
 }
