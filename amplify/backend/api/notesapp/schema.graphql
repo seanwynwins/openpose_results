@@ -1,7 +1,5 @@
 type Note 
-@model 
-@auth(rules: [{allow: owner, ownerField: "percentage"}])
-{
+@model {
   id: ID!
   name: String!
   description: String
