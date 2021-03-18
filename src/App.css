@@ -97,13 +97,20 @@ h1 {
 .floated_img
 {
     float: left;
-    border: solid rgb(121, 185, 193);
-    border-width: 6px 5px 60px 5px;
     margin-top: 20px;
     margin-bottom: 20px;
     margin-right: 20px;
     margin-left: 20px;
     width: 300px; 
+}
+
+.blue {
+  border:solid rgb(121, 185, 193);
+  border-width: 6px 5px 60px 5px;
+}
+.red {
+  border: solid rgb(210, 40, 40);
+  border-width: 6px 5px 60px 5px;
 }
 
 /* Container needed to position the button. Adjust the width as needed */

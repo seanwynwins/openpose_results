@@ -22,6 +22,8 @@ function App() {
     img.style.display = "block";
   } 
 
+  let asdf = true
+
   const [notes, setNotes] = useState([]);
   const [notes_left, setNotes_left] = useState([]);
   const [notes_right, setNotes_right] = useState([]);
@@ -55,6 +57,60 @@ function App() {
 
   //console.log(notes_selected);
 
+  async function updateDDB(note, selected) {
+    let note2 = JSON.parse(JSON.stringify(note))
+
+    delete note2.original;
+
+    delete note2.skeleton
+
+    delete note2.image2
+
+    delete note2.percentage
+
+    delete note2.neighbors
+
+    delete note2.count
+
+    let id = note2.id
+    
+    // reset note2 id to include count!
+    //note2.id = note2.id + " " + note.count
+
+    if (selected) {
+      note2.description = "true" + " " + String(note.count)
+    } else {
+      note2.description = "false" + " " + String(note.count)
+    }
+
+    console.log(note2)
+
+    await API.graphql({ query: deleteNoteMutation, variables: { input: { id } } });
+
+    await API.graphql({ query: createNoteMutation, variables: { input: note2 } });
+  }
+
+  function updateCount(thisArray, thisID, note, increment, selected) {
+    // have to update the "count" field of neighboring notes
+    for (let i = 0; i < thisArray.length; i++) {
+      let currNeighbor = thisArray[i]
+      let name = currNeighbor.id.split(" ")[0]
+      let currNeighborID = parseInt(name.slice(name.length - 3))
+      if (note.neighbors.includes(currNeighborID) && currNeighborID != thisID) {
+        console.log(currNeighborID)
+        if (increment) {
+          currNeighbor.count = currNeighbor.count + 1
+        } else {
+          currNeighbor.count = currNeighbor.count - 1
+        }
+        console.log(currNeighbor.count)
+        currNeighbor.description = currNeighbor.description.split(" ")[0] + " " + String(currNeighbor.count)
+        console.log(currNeighbor.description)
+        updateDDB(currNeighbor, selected)
+      }
+    }
+  }
+
   async function fetchNotes() {
 
     const apiData = await API.graphql({ query: listNotes });
@@ -81,12 +137,18 @@ function App() {
 
       note.percentage = parseFloat(noteInfo[1])
 
-      console.log(note.percentage)
+      note.neighbors = JSON.parse("[" + noteInfo[2] + "]");
+
+      let noteDes = note.description.split(" ")
+
+      note.count = parseInt(noteDes[1])
+
+      console.log(note.count)
 
       let selected = "false"
 
       if (note.description != null) {
-        if (note.description == "true") {
+        if (note.description.includes("true")) {
           selected = "true"
         }
       }
@@ -101,7 +163,6 @@ function App() {
           const image = await Storage.get(note.image);
           const skeleton = await Storage.get(note.name)
 
-          console.log(image2)
           note.original = image;
           note.skeleton = skeleton
           note.image2 = image2
@@ -229,25 +290,7 @@ function App() {
   async function selectImage(note, type) { // param is the argument you passed to the function
     console.log(note)
 
-    let note2 = JSON.parse(JSON.stringify(note))
-
-    delete note2.original;
-
-    delete note2.skeleton
-
-    delete note2.image2
-
-    delete note2.percentage
-
-    let id = note2.id
-
-    note2.description = "true"
-
-    console.log(note2)
-
-    await API.graphql({ query: deleteNoteMutation, variables: { input: { id } } });
-
-    await API.graphql({ query: createNoteMutation, variables: { input: note2 } });
+    updateDDB(note, true)
 
     let selected = notes_selected
 
@@ -259,11 +302,13 @@ function App() {
 
     selectedCopy.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
 
+    let thisIDName = note.id.split(" ")
+
+    let thisID = parseInt(thisIDName[0].slice(thisIDName[0].length - 3))
+
+    updateCount(selectedCopy, thisID, note, true, true)
+
     setNotes_selected(selectedCopy)
-
-    console.log(selectedCopy)
-
-    console.log(dict)
 
     let list = dict.get(type)[0]
 
@@ -271,33 +316,23 @@ function App() {
 
     let updatedCopy = [...updatedList];
 
+    console.log(updatedCopy)
+
+    console.log(thisID)
+
+    updateCount(updatedCopy, thisID, note, true, false)
+
     let func = dict.get(type)[1]
 
     func(updatedCopy)
+
+    // oh also should iterate through selected notes too
   }
 
   async function deselectImage(note) {
     console.log(note)
 
-    let note2 = JSON.parse(JSON.stringify(note))
-
-    delete note2.original;
-
-    delete note2.skeleton
-
-    delete note2.image2
-
-    delete note2.percentage
-
-    let id = note2.id
-
-    note2.description = "false"
-
-    console.log(note2)
-
-    await API.graphql({ query: deleteNoteMutation, variables: { input: { id } } });
-
-    await API.graphql({ query: createNoteMutation, variables: { input: note2 } });
+    updateDDB(note, false)
 
     // need to add back into array
     let selected = notes_selected
@@ -305,6 +340,12 @@ function App() {
     let updatedSelected = selected.filter(e => e !== note)
 
     let selectedCopy = [...updatedSelected]
+
+    let thisIDName = note.id.split(" ")
+
+    let thisID = parseInt(thisIDName[0].slice(thisIDName[0].length - 3))
+
+    updateCount(selectedCopy, thisID, note, false, true)
 
     setNotes_selected(selectedCopy)
 
@@ -326,9 +367,12 @@ function App() {
 
     updatedCopy.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
 
+    updateCount(updatedCopy, thisID, note, false, false)
+
     func(updatedCopy)
     // store notes here?
     console.log(updatedCopy)
+
   }
 
   async function createNote() {
@@ -383,12 +427,12 @@ function App() {
                 <div key={note.id || note.name}>
                   {
                     note.image &&
-                    <div className="floated_img">
-                      <b class="cluster"> {note.id} </b>
+                    <div className={"floated_img " + ((note.count > 0) ? "red" : "blue")}>
+                      <b class="cluster"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
-                        <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.original} style={{ width: 300 }} />
-                        <img src={note.image2} style={{ width: 300 }} />
+                        <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
                         <button class="btn" onClick={() => selectImage(note, "POSE.BOTH")}>Select</button>
                       </div>
                     </div>
@@ -402,11 +446,11 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img_NOFACE">
-                      <b class="cluster_NOFACE"> {note.id} </b>
+                      <b class="cluster_NOFACE"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
-                        <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.original} style={{ width: 300 }} />
-                        <img src={note.image2} style={{ width: 300 }} />
+                        <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
 
                         <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_BOTH")}>Select</button>
                       </div>
@@ -425,11 +469,11 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img">
-                      <b class="cluster"> {note.id} </b>
+                      <b class="cluster"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
-                        <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.original} style={{ width: 300 }} />
-                        <img src={note.image2} style={{ width: 300 }} />
+                        <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
 
                         <button class="btn" onClick={() => selectImage(note, "POSE.RIGHT")}>Select</button>
                       </div>
@@ -444,11 +488,11 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img_NOFACE">
-                      <b class="cluster_NOFACE"> {note.id} </b>
+                      <b class="cluster_NOFACE"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
-                        <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.original} style={{ width: 300 }} />
-                        <img src={note.image2} style={{ width: 300 }} />
+                        <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
 
                         <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_RIGHT")}>Select</button>
                       </div>
@@ -467,11 +511,11 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img">
-                      <b class="cluster"> {note.id} </b>
+                      <b class="cluster"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
-                        <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.original} style={{ width: 300 }} />
-                        <img src={note.image2} style={{ width: 300 }} />
+                        <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
 
                         <button class="btn" onClick={() => selectImage(note, "POSE.LEFT")}>Select</button>
                       </div>
@@ -486,11 +530,11 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img_NOFACE">
-                      <b class="cluster_NOFACE"> {note.id} </b>
+                      <b class="cluster_NOFACE"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
-                        <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.original} style={{ width: 300 }} />
-                        <img src={note.image2} style={{ width: 300 }} />
+                        <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
 
                         <button class="btn" onClick={() => selectImage(note, "POSE.NOFACE_LEFT")}>Select</button>
                       </div>
@@ -509,11 +553,11 @@ function App() {
                   {
                     note.image &&
                     <div className="floated_img">
-                      <b class="cluster"> {note.id} </b>
+                      <b class="cluster"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
-                        <img src={note.skeleton} style={{ width: 300 }} />
-                        <img src={note.original} style={{ width: 300 }} />
-                        <img src={note.image2} style={{ width: 300 }} />
+                        <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
 
                         <button class="btn" onClick={() => selectImage(note, "POSE.OTHER")}>Select</button>
                       </div>
@@ -530,13 +574,12 @@ function App() {
               <div key={note.id || note.name}>
                 {
                   note.image &&
-                  <div className="floated_img">
-                    <b class="cluster"> {note.id} </b>
+                  <div className={"floated_img " + ((note.count > 0) ? "red" : "blue")}>
+                  <b class="cluster"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                     <div class="container">
-                      <img src={note.skeleton} style={{ width: 300 }} />
-                      <img src={note.original} style={{ width: 300 }} />
-                      <img src={note.image2} style={{ width: 300 }} />
-
+                      <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
+                      <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
+                      <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
                       <button class="btn" onClick={() => deselectImage(note)}>Deselect</button>
                     </div>
                   </div>
