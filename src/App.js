@@ -445,7 +445,7 @@ function App() {
                 <div key={note.id || note.name}>
                   {
                     note.image &&
-                    <div className="floated_img_NOFACE">
+                    <div className={"floated_img_NOFACE " + ((note.count > 0) ? "red" : "blue")}>
                       <b class="cluster_NOFACE"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
@@ -468,7 +468,7 @@ function App() {
                 <div key={note.id || note.name}>
                   {
                     note.image &&
-                    <div className="floated_img">
+                    <div className={"floated_img " + ((note.count > 0) ? "red" : "blue")}>
                       <b class="cluster"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
@@ -487,7 +487,7 @@ function App() {
                 <div key={note.id || note.name}>
                   {
                     note.image &&
-                    <div className="floated_img_NOFACE">
+                    <div className={"floated_img_NOFACE " + ((note.count > 0) ? "red" : "blue")}>
                       <b class="cluster_NOFACE"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
@@ -510,7 +510,7 @@ function App() {
                 <div key={note.id || note.name}>
                   {
                     note.image &&
-                    <div className="floated_img">
+                    <div className={"floated_img " + ((note.count > 0) ? "red" : "blue")}>
                       <b class="cluster"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
@@ -529,7 +529,7 @@ function App() {
                 <div key={note.id || note.name}>
                   {
                     note.image &&
-                    <div className="floated_img_NOFACE">
+                    <div className={"floated_img_NOFACE " + ((note.count > 0) ? "red" : "blue")}>
                       <b class="cluster_NOFACE"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
@@ -552,7 +552,7 @@ function App() {
                 <div key={note.id || note.name}>
                   {
                     note.image &&
-                    <div className="floated_img">
+                    <div className={"floated_img " + ((note.count > 0) ? "red" : "blue")}>
                       <b class="cluster"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
