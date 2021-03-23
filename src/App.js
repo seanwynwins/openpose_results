@@ -33,6 +33,7 @@ function App() {
   const [notes_right_NF, setNotes_right_NF] = useState([]);
 
   const [notes_other, setNotes_other] = useState([]);
+  const [notes_3D, setNotes_3D] = useState([]);
 
   const [notes_selected, setNotes_selected] = useState([]);
 
@@ -46,6 +47,7 @@ function App() {
   dict.set("POSE.NOFACE_RIGHT", [notes_right_NF, setNotes_right_NF]);
   dict.set("POSE.NOFACE_LEFT", [notes_left_NF, setNotes_left_NF]);
   dict.set("POSE.OTHER", [notes_other, setNotes_other]);
+  dict.set("3D", [notes_3D, setNotes_3D]);
 
   useEffect(() => {
     fetchNotes();
@@ -71,6 +73,8 @@ function App() {
     delete note2.neighbors
 
     delete note2.count
+
+    delete note2.rotation
 
     let id = note2.id
     
@@ -111,11 +115,55 @@ function App() {
     }
   }
 
+  function containsID(list, testID) {
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].id == testID) {
+        console.log(list[i].id)
+        return true;
+      }
+    }
+    return false
+  }
+
   async function fetchNotes() {
 
-    const apiData = await API.graphql({ query: listNotes });
-    const notesFromAPI = apiData.data.listNotes.items;
-    console.log(notesFromAPI)
+    let apiData = await API.graphql({ query: listNotes});
+
+    let nextToken = apiData.data.listNotes.nextToken
+
+    let allNotes = apiData.data.listNotes.items;
+
+    let variables = {
+      nextToken,
+    }
+    
+    while (true) {
+      let apiData = await API.graphql({ query: listNotes, variables});
+
+      let notesFromAPI = apiData.data.listNotes.items;
+
+      console.log(allNotes.length)
+
+      let nextToken = apiData.data.listNotes.nextToken
+    
+      variables = {
+        nextToken,
+      }
+
+      let testID = notesFromAPI[0]
+
+      console.log(allNotes)
+
+      if (testID == undefined) {
+        break
+      }
+      else {
+        allNotes.push.apply(allNotes, notesFromAPI);
+      }
+    }
+
+    console.log(allNotes)
+
     const bothNotes = []
     const rightNotes = []
     const leftNotes = []
@@ -126,10 +174,12 @@ function App() {
 
     const otherNotes = []
 
+    const threeDNotes = []
+
     const selectedNotes = []
 
     // see the thing is you're going to have to fetch images no matter what
-    await Promise.all(notesFromAPI.map(async note => {
+    await Promise.all(allNotes.map(async note => {
 
       console.log(note.id)
 
@@ -137,7 +187,7 @@ function App() {
 
       note.percentage = parseFloat(noteInfo[1])
 
-      note.neighbors = JSON.parse("[" + noteInfo[2] + "]");
+      //note.neighbors = JSON.parse("[" + noteInfo[2] + "]");
 
       let noteDes = note.description.split(" ")
 
@@ -238,7 +288,7 @@ function App() {
           leftNotes_NF.push(note)
           return note;
         }
-        else {
+        else if (note.image.includes("POSE.OTHER")){
           let n=note.image.lastIndexOf(".jpg");
           let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
           const image2 = await Storage.get(image2Name);
@@ -251,6 +301,21 @@ function App() {
 
           otherNotes.push(note)
           return note;
+        } 
+        // 3D
+        else {
+          let n=note.image.lastIndexOf(".jpg");
+          console.log(note.image)
+          let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
+          const image2 = await Storage.get(image2Name);
+          const image = await Storage.get(note.image);
+          const skeleton = await Storage.get(note.name)
+          note.original = image;
+          note.skeleton = skeleton
+          note.image2 = image2
+          threeDNotes.push(note)
+          console.log(note.id)
+          return note;
         }
       } else {
         let n=note.image.lastIndexOf(".jpg");
@@ -262,7 +327,7 @@ function App() {
         note.original = image;
         note.skeleton = skeleton
         note.image2 = image2
-
+        
         selectedNotes.push(note)
         return note;
       }
@@ -276,7 +341,9 @@ function App() {
     leftNotes_NF.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
     otherNotes.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
     selectedNotes.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
+    threeDNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
 
+    console.log(threeDNotes)
     setNotes(bothNotes);
     setNotes_right(rightNotes);
     setNotes_left(leftNotes);
@@ -285,6 +352,7 @@ function App() {
     setNotes_right_NF(rightNotes_NF)
     setNotes_other(otherNotes)
     setNotes_selected(selectedNotes)
+    setNotes_3D(threeDNotes)
   }
 
   async function selectImage(note, type) { // param is the argument you passed to the function
@@ -559,6 +627,28 @@ function App() {
                         <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
                         <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
 
+                        <button class="btn" onClick={() => selectImage(note, "POSE.OTHER")}>Select</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        <div label="3D">
+          <div style={{ marginBottom: 30 }}>
+            {
+              notes_3D.map(note => (
+                <div key={note.id || note.name}>
+                  {
+                    note.image &&
+                    <div className={"floated_img " + ((note.count > 0) ? "red" : "blue")}>
+                      <b class="cluster"> {"Rotation " + note.id.split(" ")[0] + " Cluster " + note.id.split(" ")[1]} </b>
+                      <div class="container">
+                        <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
+                        <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
                         <button class="btn" onClick={() => selectImage(note, "POSE.OTHER")}>Select</button>
                       </div>
                     </div>
