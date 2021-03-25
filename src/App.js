@@ -187,13 +187,13 @@ function App() {
 
       note.percentage = parseFloat(noteInfo[1])
 
-      //note.neighbors = JSON.parse("[" + noteInfo[2] + "]");
+      note.neighbors = JSON.parse("[" + noteInfo[2] + "]");
 
       let noteDes = note.description.split(" ")
 
       note.count = parseInt(noteDes[1])
 
-      console.log(note.count)
+      console.log(noteInfo[4])
 
       let selected = "false"
 
@@ -305,7 +305,6 @@ function App() {
         // 3D
         else {
           let n=note.image.lastIndexOf(".jpg");
-          console.log(note.image)
           let image2Name = note.image.substring(0,n)+ ".2" +note.image.substring(n);
           const image2 = await Storage.get(image2Name);
           const image = await Storage.get(note.image);
@@ -313,8 +312,8 @@ function App() {
           note.original = image;
           note.skeleton = skeleton
           note.image2 = image2
+          note.rotation = noteInfo[3]
           threeDNotes.push(note)
-          console.log(note.id)
           return note;
         }
       } else {
@@ -327,7 +326,10 @@ function App() {
         note.original = image;
         note.skeleton = skeleton
         note.image2 = image2
-        
+        if (noteInfo[3] === undefined)
+          note.rotation = ""
+        else
+          note.rotation = noteInfo[3]
         selectedNotes.push(note)
         return note;
       }
@@ -340,8 +342,30 @@ function App() {
     rightNotes_NF.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
     leftNotes_NF.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
     otherNotes.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
-    selectedNotes.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
-    threeDNotes.sort((a, b) => (a.id > b.id) ? 1 : -1)
+    selectedNotes.sort((a, b) => {
+      if (a.rotation < b.rotation)
+        return -1;
+      else if (a.rotation > b.rotation)
+        return 1;
+      else {
+        if (a.percentage < b.percentage)
+          return 1;
+        else
+          return -1;
+      }
+    })
+    threeDNotes.sort((a, b) => {
+      if (a.rotation < b.rotation)
+        return -1;
+      else if (a.rotation > b.rotation)
+        return 1;
+      else {
+        if (a.percentage < b.percentage)
+          return 1;
+        else
+          return -1;
+      }
+    })
 
     console.log(threeDNotes)
     setNotes(bothNotes);
@@ -368,7 +392,20 @@ function App() {
 
     let selectedCopy = [...selected];
 
-    selectedCopy.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
+    selectedCopy.sort(
+      (a, b) => {
+        if (a.rotation < b.rotation)
+          return -1;
+        else if (a.rotation > b.rotation)
+          return 1;
+        else {
+          if (a.percentage < b.percentage)
+            return 1;
+          else
+            return -1;
+        }
+      }
+    )
 
     let thisIDName = note.id.split(" ")
 
@@ -390,6 +427,7 @@ function App() {
 
     updateCount(updatedCopy, thisID, note, true, false)
 
+    console.log(type)
     let func = dict.get(type)[1]
 
     func(updatedCopy)
@@ -419,7 +457,12 @@ function App() {
 
     let string = note["name"]
 
+    console.log(string.split("_skeleton"))
+
     let type = string.split("_skeleton")[0];
+
+    if (!string.includes("skeleton"))
+      type = "3D"
 
     console.log(type)
 
@@ -433,7 +476,18 @@ function App() {
 
     let func = dict.get(type)[1]
 
-    updatedCopy.sort((a, b) => (a.percentage < b.percentage) ? 1 : -1)
+    updatedCopy.sort((a, b) => {
+      if (a.rotation < b.rotation)
+        return -1;
+      else if (a.rotation > b.rotation)
+        return 1;
+      else {
+        if (a.percentage < b.percentage)
+          return 1;
+        else
+          return -1;
+      }
+    })
 
     updateCount(updatedCopy, thisID, note, false, false)
 
@@ -643,13 +697,13 @@ function App() {
                 <div key={note.id || note.name}>
                   {
                     note.image &&
-                    <div className={"floated_img " + ((note.count > 0) ? "red" : "blue")}>
-                      <b class="cluster"> {"Rotation " + note.id.split(" ")[0] + " Cluster " + note.id.split(" ")[1]} </b>
+                    <div className={"floated_img_three " + ((note.count > 0) ? "red" : "blue")}>
+                      <b class="cluster"> {"Rotation " + note.id.split(" ")[3] + " Cluster " + note.id.split(" ")[0] + ":" + (parseFloat((note.id.split(" ")[1])) * 100).toFixed(2) + '%'} </b>
                       <div class="container">
                         <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
                         <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
                         <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
-                        <button class="btn" onClick={() => selectImage(note, "POSE.OTHER")}>Select</button>
+                        <button class="btn" onClick={() => selectImage(note, "3D")}>Select</button>
                       </div>
                     </div>
                   }
@@ -665,7 +719,7 @@ function App() {
                 {
                   note.image &&
                   <div className={"floated_img " + ((note.count > 0) ? "red" : "blue")}>
-                  <b class="cluster"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
+                  <b class="cluster"> {"Rotation " + note.id.split(" ")[3] + " Cluster " + note.id.split(" ")[0] + ":" + (parseFloat((note.id.split(" ")[1])) * 100).toFixed(2) + '%'} </b>
                     <div class="container">
                       <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
                       <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
