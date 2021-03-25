@@ -39,6 +39,8 @@ function App() {
 
   const [formData, setFormData] = useState(initialFormState);
 
+  const [three_ranking, set_three_ranking] = useState("");
+
   const dict = new Map();
   dict.set("POSE.BOTH", [notes, setNotes]);
   dict.set("POSE.RIGHT", [notes_right, setNotes_right]);
@@ -178,6 +180,10 @@ function App() {
 
     const selectedNotes = []
 
+    const ranking = []
+
+    let allRankings = []
+
     // see the thing is you're going to have to fetch images no matter what
     await Promise.all(allNotes.map(async note => {
 
@@ -314,6 +320,10 @@ function App() {
           note.image2 = image2
           note.rotation = noteInfo[3]
           threeDNotes.push(note)
+          if (!(noteInfo[4] === undefined)) {
+            allRankings = noteInfo[4].split(",")
+          }
+          //set_three_ranking(ranking)
           return note;
         }
       } else {
@@ -367,6 +377,15 @@ function App() {
       }
     })
 
+    //console.log(allRankings)
+    for (let i = 0; i < allRankings.length; i++) {
+      let string = "Rotation " + i + " : " + allRankings[i] + " Clusters"
+      console.log(string)
+      ranking.push(string)
+      ranking.push(<br />)
+      ranking.push(<br />)
+    }
+
     console.log(threeDNotes)
     setNotes(bothNotes);
     setNotes_right(rightNotes);
@@ -377,6 +396,7 @@ function App() {
     setNotes_other(otherNotes)
     setNotes_selected(selectedNotes)
     setNotes_3D(threeDNotes)
+    set_three_ranking(ranking)
   }
 
   async function selectImage(note, type) { // param is the argument you passed to the function
@@ -525,22 +545,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1 >Pose Clustering Results </h1>
-      <input
-        onChange={e => setFormData({ ...formData, 'name': e.target.value })}
-        placeholder="Video name"
-        value={formData.name}
-      />
-      <input
-        onChange={e => setFormData({ ...formData, 'description': e.target.value })}
-        placeholder="Video description"
-        value={formData.description}
-      />
-      <input
-        type="file"
-        onChange={onChange}
-      />
-      <button class="button" onClick={createNote}>Cluster!</button>
+      <h1 >Pose Clustering Results</h1>
       <Tabs>
         <div label="Both Sides">
           <div style={{ marginBottom: 30 }}>
@@ -550,8 +555,8 @@ function App() {
                   {
                     note.image &&
                     <div className={"floated_img " + ((note.count > 0) ? "red" : "blue")}>
-                      <b class="cluster"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
-                      <div class="container">
+                      <b className="cluster"> {note.id.split(" ")[0] + " " + note.id.split(" ")[1]} </b>
+                      <div className="container">
                         <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
                         <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
                         <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
@@ -698,12 +703,12 @@ function App() {
                   {
                     note.image &&
                     <div className={"floated_img_three " + ((note.count > 0) ? "red" : "blue")}>
-                      <b class="cluster"> {"Rotation " + note.id.split(" ")[3] + " Cluster " + note.id.split(" ")[0] + ":" + (parseFloat((note.id.split(" ")[1])) * 100).toFixed(2) + '%'} </b>
-                      <div class="container">
+                      <b className="cluster"> {"Rotation " + note.id.split(" ")[3] + " Cluster " + note.id.split(" ")[0] + ":" + (parseFloat((note.id.split(" ")[1])) * 100).toFixed(2) + '%'} </b>
+                      <div className="container">
                         <img src={note.skeleton} style={{ width: 300 }} title={note.neighbors}/>
                         <img src={note.original} style={{ width: 300 }} title={note.neighbors}/>
                         <img src={note.image2} style={{ width: 300 }} title={note.neighbors}/>
-                        <button class="btn" onClick={() => selectImage(note, "3D")}>Select</button>
+                        <button className="btn" onClick={() => selectImage(note, "3D")}>Select</button>
                       </div>
                     </div>
                   }
@@ -731,6 +736,9 @@ function App() {
               </div>
             ))
           }
+        </div>
+        <div label="Rotation Rankings">
+        <p> {three_ranking}</p>
         </div>
       </Tabs>
       <AmplifySignOut />
