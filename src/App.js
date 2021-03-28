@@ -138,6 +138,8 @@ function App() {
     let variables = {
       nextToken,
     }
+
+    let count = 0
     
     while (true) {
       let apiData = await API.graphql({ query: listNotes, variables});
@@ -162,6 +164,10 @@ function App() {
       else {
         allNotes.push.apply(allNotes, notesFromAPI);
       }
+
+      count += 1
+      if (count == 1)
+        break
     }
 
     console.log(allNotes)
